@@ -1,0 +1,32 @@
+xml.instruct!
+
+xml.feed "xmlns" => "http://www.w3.org/2005/Atom" do
+  xml.title   self.title
+  xml.link    "rel" => "self", "href" => request.url
+  xml.link    "rel" => "alternate", "href" => URI.escape(request.scheme_and_host + self.path)
+  xml.id      request.url
+  xml.updated articles.first.published.strftime "%Y-%m-%dT%H:%M:%SZ" if articles.any?
+  xml.summary "" # FIXME: implement
+  xml.author do
+    xml.name site.name
+  end
+
+  articles.each do |article|
+    xml.entry do
+      xml.title   article.title
+      xml.link    "rel" => "alternate", "href" => article.path
+      xml.id      URI.escape(request.scheme_and_host + article.path)
+      xml.updated article.published.strftime "%Y-%m-%dT%H:%M:%SZ"
+      xml.author  { xml.name article.author.name } if !article.author.nil?
+      xml.summary article.content #HTML.new(article.content).to_text # FIXME: implement correctly
+
+      xml.content "type" => "html" do
+        xml.text! article.content
+      end
+      
+      #unless article.attachment.nil?
+      #  xml.link "rel" => "enclosure", "type" => article.attachment.mime_type, "href" => URI.escape(request.scheme_and_host + article.attachment.url.to_s), "length" => article.attachment.length
+      #end
+    end
+  end
+end
