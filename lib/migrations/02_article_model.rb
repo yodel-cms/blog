@@ -4,7 +4,7 @@ class ArticleModelMigration < Migration
       add_field :published, :time
       add_field :tags, :tags
       add_field :blog, :alias, of: :parent
-      add_field :search_title, :function, fn: 'format("News: {{title}}")'
+      add_field :search_title, :function, fn: 'format("News: {{title}}")', display: false
       add_one   :author, model: :user
       articles.allowed_parents = [site.blogs]
     end

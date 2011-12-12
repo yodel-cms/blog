@@ -1,4 +1,6 @@
 class Blog < Page
+  attr_reader :number_of_pages, :page_params, :tag, :total_articles, :month, :year
+  
   respond_to :get do
     with :atom do |xml|
       @xml = xml
@@ -31,6 +33,10 @@ class Blog < Page
     @total_articles = query.count
     @number_of_pages = (@total_articles.to_f / articles_per_page).ceil
     query.limit(articles_per_page).skip(page_number * articles_per_page).all
+  end
+  
+  def latest_articles(limit = 3)
+    site.articles.where(parent: id).order('published desc').limit(limit).all
   end
   
   def first_page?
