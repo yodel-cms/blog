@@ -2,6 +2,11 @@ class Blog < Page
   attr_reader :number_of_pages, :page_params, :tag, :total_articles, :month, :year
   
   respond_to :get do
+    with :html do
+      articles
+      super()
+    end
+    
     with :atom do |xml|
       @xml = xml
       layout('atom').render(self)
@@ -44,7 +49,7 @@ class Blog < Page
   end
   
   def last_page?
-    page_number == @number_of_pages - 1
+    page_number == (@number_of_pages - 1)
   end
   
   def page_number
@@ -53,6 +58,26 @@ class Blog < Page
   
   def tag_path(tag)
     "#{path}?tag=#{CGI::escape(tag || '')}"
+  end
+  
+  def page_path(page_number)
+    "#{path}?page=#{page_number}"
+  end
+  
+  def previous_page_path
+    if first_page?
+      path
+    else
+      "#{path}?page=#{page_number - 1}"
+    end
+  end
+  
+  def next_page_path
+    if last_page?
+      path
+    else
+      "#{path}?page=#{page_number + 1}"
+    end
   end
   
   def month_path(month, year)
